@@ -1,41 +1,54 @@
 #include "Cell.h"
+#include "Debugger.h"
 
 
-
-void Cell::CalculateNewState(vector<vector<Cell>> map)
+void Cell::CalculateNewState(vector<vector<Cell>> &map)
 {
-	auto x = pos.x;
-	auto y = pos.y;
+	int x = pos.x;
+	int y = pos.y;
 	int neighbors = 0;
 
-	if (cur_state == true)
-	{
 		// ERROR CHECK FOR OUT OF BOUNDS
-		if (map[y + 1][x].IsAlive())
+	try {
+		if (map.at(y+1).at(x).IsAlive())
 			neighbors++;
-		if (map[y - 1][x].IsAlive())
+		if (map.at(y - 1).at(x).IsAlive())
 			neighbors++;
-		if (map[y][x + 1].IsAlive())
+		if (map.at(y).at(x+1).IsAlive())
 			neighbors++;
-		if (map[y][x - 1].IsAlive())
+		if (map.at(y).at(x-1).IsAlive())
 			neighbors++;
-		if (map[y - 1][x - 1].IsAlive())
+		if (map.at(y - 1).at(x - 1).IsAlive())
 			neighbors++;
-		if (map[y + 1][x + 1].IsAlive())
+		if (map.at(y + 1).at(x + 1).IsAlive())
 			neighbors++;
-		if (map[y - 1][x + 1].IsAlive())
+		if (map.at(y - 1).at(x + 1).IsAlive())
 			neighbors++;
-		if (map[y + 1][x - 1].IsAlive())
+		if (map.at(y + 1).at(x - 1).IsAlive())
 			neighbors++;
-
-		if (neighbors < 2)
-			next_state = 0;
+	}
+	catch (const std::out_of_range& e) {
+		
+	}
+		
+	if (map[y][x].IsAlive()) {
+		if (neighbors < 2 || neighbors > 3)
+		{
+			map[y][x].next_state = false;
+		}
+		else
+			map[y][x].next_state = true;
+	}
+	else
+	{
+		if (neighbors == 3)
+			map[y][x].next_state = true;
 	}
 }
 
-void Cell::Step()
+void Cell::Step(vector<vector<Cell>> &map)
 {
-	cur_state = next_state;
+	map[pos.y][pos.x].cur_state = next_state;
 }
 
 bool Cell::IsAlive()
@@ -45,10 +58,15 @@ bool Cell::IsAlive()
 
 void Cell::Display()
 {
-	if (cur_state == 0)
+	if (cur_state == false)
+	{
+		//cout << ".";
 		cout << char(176);
-	else
+	}
+	else if (cur_state == true)
+	{
 		cout << char(178);
+	}
 }
 
 Cell::Cell(int x, int y, bool state)
